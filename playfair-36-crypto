@@ -1,0 +1,108 @@
+def key():
+
+    """prompts user to enter alphanumeric key and create 6x6  Playfair code table and then flattens it for ease of parsing
+
+    The key is stored as raw_key. Iterate through stripped iter_key and append each letter to uni_key if not present yet.
+    Fill the rest of table with missing letters of alphabet and numbers 0-9 creating 6x6 Playfair cypher table
+    """
+
+    while True:
+        raw_key = input('Enter encryption key: ')
+        if len(raw_key) < 36 and ''.join((raw_key.split())).isalnum():
+            break
+        else:
+            print('Enter shorter key (max 36 characters)')
+    
+    #''.join(x.split()) removes whitespaces
+    
+    iter_key = ''.join(raw_key.split()).lower()
+    uni_key = []
+
+    for letter in iter_key:
+        if letter not in uni_key:
+            uni_key.append(letter)
+
+    inp_key = ''.join(uni_key)
+
+# Create list Dice with 6 empty lists. Iterate through letters of key and append them to first list till the counter
+# temp hits 6 - then reset temp and increment cnt designating the list (row) of dice by one
+    dice = [[] for i in range(0, 6)]
+    cnt = 0
+    temp = 0
+
+    for char in inp_key:
+        dice[cnt].append(char)
+        temp += 1
+        if temp == 6:
+            cnt += 1
+            temp = 0
+
+# This iterates through all the letters of alphabet and adds them if they weren't part of key
+    for numb in range(ord('a'), ord('z') + 1):
+        if chr(numb) not in inp_key:
+            dice[cnt].append(chr(numb))
+            temp += 1
+
+        if temp == 6 and cnt == 5:
+            break
+
+        if temp == 6:
+            cnt += 1
+            temp = 0
+    for number in range(0,10):
+        if str(number) not in inp_key:
+            dice[cnt].append(str(number))
+            temp += 1
+
+        if temp == 6 and cnt == 5:
+            break
+
+        if temp == 6:
+            cnt += 1
+            temp = 0
+
+    for elem in dice:
+        print(elem)
+
+    #flattens the 'dice' matrix into a single string for easy parsing
+    flattened = ''.join([''.join(el) for el in dice])
+    return flattened
+
+def search_index(two_letters, table):
+
+  """returns indices of given pair of letters in cypher table"""
+  
+    assert type(two_letters) == str
+
+    ind_1 = table.find(two_letters[0])
+    x_index_1 = ind_1%6
+    y_index_1 = ind_1//6
+
+    ind_2 = table.find(two_letters[1])
+    x_index_2 = ind_2 % 6
+    y_index_2 = ind_2 // 6
+    return (x_index_1,y_index_1,x_index_2,y_index_2)
+
+def text_preparation(text):
+    
+    """prepares text for digraphic ciphering by splitting text into words and then the spliting words along uncoded chars"""
+    
+    text = """{}""".format(text)
+    words = text.split()
+    preprocessed_text = []
+
+    for word in words:
+        iterable_word = ''
+        for character in word:
+            if character.isalnum():
+                iterable_word = iterable_word + character
+            else:
+                iterable_word = iterable_word + ' {} '.format(character)
+        preprocessed_text.append(iterable_word)
+
+    def splitting(elem):
+        return elem.split()
+
+    processed_text = list(map(splitting, preprocessed_text))
+
+    return processed_text
